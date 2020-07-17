@@ -1,0 +1,8 @@
+applications:
+- name: cf-kong
+  buildpack: https://bitbucket.org/cf-utilities/cf-buildpack-multi
+  command: ./run.sh
+  services:
+  - kong-db
+  memory:
+    - 1G
