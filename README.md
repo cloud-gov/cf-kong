@@ -9,7 +9,7 @@ cf create-service aws-rds shared-psql kong-db
 cf push your-kong-app
 ```
 
-You can swap out `shared-psql` for a [larger Postgres instance](https://cloud.gov/docs/services/relational-database/#plans) based on your needs.
+You can swap out `shared-psql` for a [larger Postgres instance](https://cloud.gov/docs/services/relational-database/#plans) based on your needs. You can also adjust the amount of memory used by the app by changing the setting in the `manifest.yml` file.
 
 port `8080` is used for incoming HTTP traffic from your clients. You can access this endpoint via `https://your-kong-app.app.cloud.gov`.
 
