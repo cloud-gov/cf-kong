@@ -1,22 +1,25 @@
-# [Kong](https://getkong.org/) on Cloud Foundry
+# [Kong](https://getkong.org/) on Cloud.gov
 
+## How to deploy on cloud.gov
 
-## How to deploy on [Pivotal Web Services](https://run.pivotal.io)
+Note - this approach was [adapted from this repository](https://github.com/making/cf-kong). This is probably not a production ready way to run Kong, but should allow a way to test it out in the cloud.gov environment. The [Kong Docker image](https://hub.docker.com/_/kong) is another way to try out Kong APi Gateway.
 
 ```
 cf create-service aws-rds shared-psql kong-db
-cf push kong-test
+cf push your-kong-app
 ```
 
-port `8080` is used for incoming HTTP traffic from your clients. You can access this endpoint via `https://you-kong.cfapps.io`.
-port `8001` is used for the Admin API. You can access this endpoint with the following command.
+You can swap out `shared-psql` for a [larger Postgres instance](https://cloud.gov/docs/services/relational-database/#plans) based on your needs. You can also adjust the amount of memory used by the app by changing the setting in the `manifest.yml` file.
+
+port `8080` is used for incoming HTTP traffic from your clients. You can access this endpoint via `https://your-kong-app.app.cloud.gov`.
+
+### Note - instructions below have not been verified/updated.
+
+Port `8001` is used for the Admin API. You can access this endpoint with the following command.
 
 ```
 cf ssh -N -T -L 8001:localhost:8001 your-kong
 ```
-
-> If you use a postgres service which is different from elephantsql, you need to change `SERVICE` in `run.sh`.
-
 
 ## Add your API
 
