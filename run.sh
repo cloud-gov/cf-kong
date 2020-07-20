@@ -20,8 +20,6 @@ export KONG_PG_PASSWORD=`echo $VCAP_SERVICES | jq -r '.["'$SERVICE'"][0].credent
 export KONG_LUA_PACKAGE_PATH=$LUA_PATH
 export KONG_LUA_PACKAGE_CPATH=$LUA_CPATH
 
-lsb_release -sc
-
 # start kong
 kong start --vv
 
