@@ -1,7 +1,8 @@
 applications:
 - name: cf-kong
-  buildpack: https://bitbucket.org/cf-utilities/cf-buildpack-multi
+  buildpack: https://github.com/cloudfoundry/multi-buildpack
   command: ./run.sh
   services:
-  - kong-db
+  - kong-db 
+  instances: 1
   memory: 1G
