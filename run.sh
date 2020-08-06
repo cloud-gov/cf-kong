@@ -3,12 +3,16 @@
 export KONG_PROXY_LISTEN=0.0.0.0:8080
 export KONG_ADMIN_LISTEN=0.0.0.0:8081
 
-export LD_LIBRARY_PATH=/home/vcap/deps/0/apt/usr/local/lib:/home/vcap/deps/0/apt/usr/local/lib/lua/5.1/:/home/vcap/deps/0/apt/usr/local/openresty/luajit/lib:/home/vcap/deps/0/apt/usr/local/openresty/pcre/lib:/home/vcap/deps/0/apt/usr/local/openresty/openssl111/lib:$LD_LIBRARY_PATH
-export LUA_PATH='/home/vcap/deps/0/apt/usr/local/share/lua/5.1/?.lua;/home/vcap/deps/0/apt/usr/local/share/lua/5.1/?/init.lua;/home/vcap/deps/0/apt/usr/local/openresty/lualib/?.lua'
-export LUA_CPATH='/home/vcap/deps/0/apt/usr/local/lib/lua/5.1/?.so'
-export PATH=/home/vcap/deps/0/apt/usr/local/bin/:/home/vcap/deps/0/apt/usr/local/openresty/nginx/sbin:/home/vcap/deps/0/apt/usr/local/openresty/bin:$PATH
+# Make location of libs configurable
+LOCAL='/home/vcap/deps/0/apt/usr/local'
 
-grep -irIl '/usr/local' ../deps/0/apt | xargs sed -i -e 's|/usr/local|/home/vcap/deps/0/apt/usr/local|'
+export LD_LIBRARY_PATH=$LOCAL/lib:$LOCAL/lib/lua/5.1/:$LOCAL/openresty/luajit/lib:$LOCAL/openresty/pcre/lib:$LOCAL/openresty/openssl111/lib:$LD_LIBRARY_PATH
+export LUA_PATH="$LOCAL/share/lua/5.1/?.lua;$LOCAL/share/lua/5.1/?/init.lua;$LOCAL/openresty/lualib/?.lua"
+export LUA_CPATH="$LOCAL/lib/lua/5.1/?.so"
+export PATH=$LOCAL/bin/:$LOCAL/openresty/nginx/sbin:$LOCAL/openresty/bin:$PATH
+
+# Ensure references to /usr/local resolve correctly
+grep -irIl '/usr/local' ../deps/0/apt | xargs sed -i -e "s|/usr/local|$LOCAL|"
 
 SERVICE=aws-rds
 export KONG_PG_USER=`echo $VCAP_SERVICES | jq -r '.["'$SERVICE'"][0].credentials.username'`
@@ -19,11 +23,11 @@ export KONG_PG_PASSWORD=`echo $VCAP_SERVICES | jq -r '.["'$SERVICE'"][0].credent
 export KONG_LUA_PACKAGE_PATH=$LUA_PATH
 export KONG_LUA_PACKAGE_CPATH=$LUA_CPATH
 
-# start kong
+# Start kong
 kong migrations bootstrap
 kong start --vv
 
-# keep this process alive
+# Keep this process alive
 while true;do
 	sleep 10
 	nginx_count=`ps aux | grep maste[r] | wc -l`
