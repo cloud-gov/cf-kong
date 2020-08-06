@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export KONG_PROXY_LISTEN=0.0.0.0:8080
-#export KONG_ADMIN_LISTEN=0.0.0.0:8080
+export KONG_ADMIN_LISTEN=0.0.0.0:8081
 
 export LD_LIBRARY_PATH=/home/vcap/deps/0/apt/usr/local/lib:/home/vcap/deps/0/apt/usr/local/lib/lua/5.1/:/home/vcap/deps/0/apt/usr/local/openresty/luajit/lib:/home/vcap/deps/0/apt/usr/local/openresty/pcre/lib:/home/vcap/deps/0/apt/usr/local/openresty/openssl111/lib:$LD_LIBRARY_PATH
 export LUA_PATH='/home/vcap/deps/0/apt/usr/local/share/lua/5.1/?.lua;/home/vcap/deps/0/apt/usr/local/share/lua/5.1/?/init.lua;/home/vcap/deps/0/apt/usr/local/openresty/lualib/?.lua'
