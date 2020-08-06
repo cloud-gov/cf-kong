@@ -13,59 +13,68 @@ You can swap out `shared-psql` for a [larger Postgres instance](https://cloud.go
 
 port `8080` is used for incoming HTTP traffic from your clients. You can access this endpoint via `https://your-kong-app.app.cloud.gov`.
 
-Note - instructions below have not been verified/updated.
-
 Port `8001` is used for the Admin API. You can access this endpoint with the following command.
 
 ```
-cf ssh -N -T -L 8001:localhost:8001 your-kong
+cf ssh -N -T -L 8081:localhost:8081 your-kong-app
 ```
 
-## Add your API
+## Map a route to your service
 
+```bash
+~$ cf map-route cf-kong app.cloud.gov -n example-api-kong
 ```
-$ cf map-route your-kong cfapps.io -n example-api-kong
-$ curl -is -X POST http://localhost:8001/apis -d name=example-api -d hosts=example-api-kong.cfapps.io -d upstream_url=http://httpbin.org 
+
+## Add a service in Kong
+
+```bash
+~$ curl -i -X POST http://localhost:8081/services --data name=example_service --data url='https://www.google.com/'
+
+
 HTTP/1.1 201 Created
-Date: Wed, 05 Jul 2017 18:21:10 GMT
+Date: Thu, 06 Aug 2020 14:47:18 GMT
 Content-Type: application/json; charset=utf-8
-Transfer-Encoding: chunked
 Connection: keep-alive
 Access-Control-Allow-Origin: *
-Server: kong/0.10.3
+Server: kong/2.1.1
+Content-Length: 366
+X-Kong-Admin-Latency: 11
 
-{"http_if_terminated":true,"id":"278a32ee-d9a9-48ac-92eb-7f39070545ea","retries":5,"preserve_host":false,"created_at":1499278870000,"upstream_connect_timeout":60000,"upstream_url":"http:\/\/httpbin.org","upstream_read_timeout":60000,"https_only":false,"upstream_send_timeout":60000,"strip_uri":true,"name":"example-api","hosts":["example-api-kong.cfapps.io"]}
+{"host":"www.google.com","id":"f9c4a6b3-5abb-4dac-8638-ddb0900b3a33","protocol":"https","read_timeout":60000,"tls_verify_depth":null,"port":443,"updated_at":1596725238,"ca_certificates":null,"created_at":1596725238,"connect_timeout":60000,"write_timeout":60000,"name":"example_service","retries":5,"path":"\/","tls_verify":null,"tags":null,"client_certificate":null}
 ```
 
-## Forward your requests through Kong
+## Verify the service's endpoint:
 
-```
-curl https://example-api-kong.cfapps.io
-```
+```bash
+~$ curl -i http://localhost:8081/services/example_service
 
-## Use Basic Authentication Plugin
+HTTP/1.1 200 OK
+Date: Thu, 06 Aug 2020 14:48:15 GMT
+Content-Type: application/json; charset=utf-8
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Server: kong/2.1.1
+Content-Length: 366
+X-Kong-Admin-Latency: 3
 
-### Enable plugin
-
-```
-curl -X POST http://localhost:8001/apis/example-api/plugins -d name=basic-auth -d config.hide_credentials=true
-```
-
-### Add consumer
-
-```
-curl -X POST http://localhost:8001/consumers -d username=demo
+{"host":"www.google.com","id":"f9c4a6b3-5abb-4dac-8638-ddb0900b3a33","protocol":"https","read_timeout":60000,"tls_verify_depth":null,"port":443,"updated_at":1596725238,"ca_certificates":null,"created_at":1596725238,"connect_timeout":60000,"write_timeout":60000,"name":"example_service","retries":5,"path":"\/","tls_verify":null,"tags":null,"client_certificate":null}
 ```
 
-### Add user
+## Add a route
 
-```
-curl -X POST http://localhost:8001/consumers/demo/basic-auth -d username=user -d password=password
+```bash
+~$ curl -i -X POST http://localhost:8081/services/example_service/routes --data 'paths[]=/google' --data 'name=google'
+
+HTTP/1.1 201 Created
+Date: Thu, 06 Aug 2020 14:49:31 GMT
+Content-Type: application/json; charset=utf-8
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Server: kong/2.1.1
+Content-Length: 430
+X-Kong-Admin-Latency: 12
+
+{"id":"9e9f0d56-7ac9-4341-9481-41c5736e309e","path_handling":"v0","paths":["\/google"],"destinations":null,"headers":null,"protocols":["http","https"],"created_at":1596725371,"snis":null,"service":{"id":"f9c4a6b3-5abb-4dac-8638-ddb0900b3a33"},"name":"google","strip_path":true,"preserve_host":false,"regex_priority":0,"updated_at":1596725371,"sources":null,"methods":null,"https_redirect_status_code":426,"hosts":null,"tags":null}
 ```
 
-Access example API
-
-```
-curl -u user:password https://example-api-kong.cfapps.io
-```
-
+Try opening https://example-api-kong.app.cloud.gov/google in your web browser.
