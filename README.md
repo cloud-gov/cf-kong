@@ -13,7 +13,7 @@ You can swap out `shared-psql` for a [larger Postgres instance](https://cloud.go
 
 port `8080` is used for incoming HTTP traffic from your clients. You can access this endpoint via `https://your-kong-app.app.cloud.gov`.
 
-Port `8001` is used for the Admin API. You can access this endpoint with the following command.
+Port `8081` is used for the Admin API. You can access this endpoint with the following command.
 
 ```
 cf ssh -N -T -L 8081:localhost:8081 your-kong-app
