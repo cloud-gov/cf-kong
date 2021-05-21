@@ -25,7 +25,7 @@ export KONG_LUA_PACKAGE_CPATH=$LUA_CPATH
 
 # Start kong
 kong migrations bootstrap
-kong start --vv
+kong start --v
 
 # Keep this shell process alive. If it exits, it will cause cloudfoundry to try to restart the instance.
 while true;do
