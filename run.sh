@@ -32,7 +32,6 @@ while true;do
   sleep 10
   if ! pgrep --full "nginx: master process" > /dev/null; then
     echo "Main Nginx process crashed"
-    ps aux
     exit 1
   fi
 done
