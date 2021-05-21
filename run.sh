@@ -27,13 +27,12 @@ export KONG_LUA_PACKAGE_CPATH=$LUA_CPATH
 kong migrations bootstrap
 kong start --vv
 
-# Keep this process alive
+# Keep this shell process alive. If it exits, it will cause cloudfoundry to try to restart the instance.
 while true;do
-	sleep 10
-	nginx_count=`ps aux | grep maste[r] | wc -l`
-	if [ "$nginx_count" != "1" ];then
-		echo "Some process crashed"
-		ps aux
-		exit 1
-	fi
+  sleep 10
+  if ! pgrep --full "nginx: master process" > /dev/null; then
+    echo "Main Nginx process crashed"
+    ps aux
+    exit 1
+  fi
 done
