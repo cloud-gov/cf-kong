@@ -29,10 +29,8 @@ kong migrations bootstrap
 kong start --v
 
 # Keep this shell process alive. If it exits, it will cause cloudfoundry to try to restart the instance.
-while true; do
+while kong health > /dev/null; do
   sleep 10
-  if ! pgrep --full "nginx: master process" > /dev/null; then
-    echo "Main Nginx process crashed"
-    exit 1
-  fi
 done
+
+exit 1
